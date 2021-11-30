@@ -1,7 +1,8 @@
+import config from 'config';
 import { Pool } from "pg";
 
-const connectionString = '';
+const connectionString = config.get<string>('database.uri');
 
-const db = new Pool({connectionString});
+const db = new Pool({ connectionString });
 
 export default db;

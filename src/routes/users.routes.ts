@@ -1,44 +1,55 @@
-import {Request, Response, NextFunction, Router} from 'express';
+import { NextFunction, Request, Response, Router } from "express";
 import { StatusCodes } from 'http-status-codes';
-import DatabaseError from '../models/errors/database.error.model';
+import { User } from '../models/user.models';
 import userRepository from '../repositories/user.repository';
 
-const usersRoute = Router();
+const route = Router();
 
-usersRoute.get('/users', async (req: Request, res: Response, next: NextFunction) => {
-    const users = await userRepository.findAllUsers();
-    res.status(200).send(users);
+route.get('/:uuid', async (req: Request<{ uuid: string }>, res: Response, next: NextFunction) => {
+    try {
+        const uuid = req.params.uuid;
+        const user: User | null = await userRepository.findByUuid(uuid);
+
+        if (!user) {
+            return res.sendStatus(StatusCodes.NO_CONTENT);
+        }
+
+        return res.status(StatusCodes.OK).json(user);
+    } catch (error) {
+        return next(error);
+    }
 });
 
-usersRoute.get('/user/:uuid', async (req: Request<{ uuid: string }>, res: Response, next: NextFunction) => {
-   try {
-    const user = req.params.uuid;
-    const foundUser = await userRepository.findById(user);
-    res.status(StatusCodes.OK).send({ foundUser });
-   } catch (error) {
-       next(error);
-   }
+route.post('/', async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const user: User = req.body;
+        const uuid = await userRepository.create(user);
+        return res.status(StatusCodes.CREATED).json({ uuid });
+    } catch (error) {
+        return next(error);
+    }
 });
 
-usersRoute.post('/users', async (req: Request, res: Response, next: NextFunction) => {
-    const newUser = req.body;
-    const user = await userRepository.create(newUser);
-    res.status(StatusCodes.CREATED).send(user);
+route.put('/:uuid', async (req: Request<{ uuid: string }>, res: Response, next: NextFunction) => {
+    try {
+        const uuid = req.params.uuid;
+        const user: User = req.body;
+        user.uuid = uuid;
+        const updatedUser = await userRepository.update(user);
+        return res.status(StatusCodes.OK).json(updatedUser);
+    } catch (error) {
+        return next(error);
+    }
 });
 
-usersRoute.put('/user/:uuid', async (req: Request<{ uuid: string }>, res: Response, next: NextFunction) => {
-    const user = req.params.uuid;
-    const modifiedUser = req.body;
-    modifiedUser.uuid = user;
-
-    await userRepository.update(modifiedUser);
-    res.status(StatusCodes.OK).send();
+route.delete('/:uuid', async (req: Request<{ uuid: string }>, res: Response, next: NextFunction) => {
+    try {
+        const uuid = req.params.uuid;
+        await userRepository.remove(uuid);
+        return res.sendStatus(StatusCodes.OK);
+    } catch (error) {
+        return next(error);
+    }
 });
 
-usersRoute.delete('/user/:uuid', async (req: Request<{ uuid: string }>, res: Response, next: NextFunction) => {
-    const uuid = req.params.uuid;
-    await userRepository.remove(uuid);
-    res.status(StatusCodes.OK);
-});
-
-export default usersRoute;
+export default route;
