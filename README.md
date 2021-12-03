@@ -18,7 +18,7 @@
 
 ### Authentication
 
-* POST /token
+* POST /authentication/token
 * POST /token/validate
 
 ### To Start
@@ -39,6 +39,10 @@ To start the application
   npm run start dev 
   
 ```
-
+### API Test
+You will need a API Client,you can use:
+* Postman
+* Insomnia
+* Thunder Client (extension for vsCode)
 
 [Link](https://docs.google.com/presentation/d/1xcmu1IRAfPiWWEB6Y93ioVhup1McR3VY/edit?usp=sharing&ouid=111532941625525152923&rtpof=true&sd=true) for slides used during the live.
