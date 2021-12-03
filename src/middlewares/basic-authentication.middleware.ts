@@ -12,14 +12,14 @@ const basicAuthMiddleware = async (req: Request, res: Response, next: NextFuncti
     
         const [authorizationType, base64Token] = authorizationHeader.split(' ');
     
-        if (authorizationType !== 'Basic') {
+        if (authorizationType !== 'Bearer') {
             throw new ForbiddenError({ log: 'Invalid authorization type' });
         }
     
         const [username, password] = Buffer.from(base64Token, 'base64').toString('utf-8').split(':');
     
         if (!username || !password) {
-            throw new ForbiddenError({ log: 'Credenciais not found' });
+            throw new ForbiddenError({ log: 'Credentials not found' });
         }
     
         const user = await userRepository.findByUsernameAndPassword(username, password);

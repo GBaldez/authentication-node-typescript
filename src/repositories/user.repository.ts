@@ -7,6 +7,16 @@ const authenticationCryptKey = config.get<string>('authentication.cryptKey');
 
 class UserRepository {
 
+    async findAllUsers(): Promise<User[]> {
+        const query = `
+            SELECT uuid, username
+            FROM application_user
+        `;
+
+        const { rows } = await db.query<User>(query);
+        return rows || [];
+    }
+
     async create(user: User): Promise<string> {
         try {
             const script = `
@@ -35,11 +45,12 @@ class UserRepository {
                 SET
                     username = $2,
                     password = crypt($3, '${authenticationCryptKey}')
-                WHERE uuid = $1            
+                WHERE uuid = $1      
             `;
 
             const values = [user.uuid, user.username, user.password];
             await db.query(script, values);
+            
         } catch (error) {
             throw new DatabaseError({ log: 'Erro ao atualizar usuário', data: error });
         }

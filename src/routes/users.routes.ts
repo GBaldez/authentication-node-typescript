@@ -3,9 +3,15 @@ import { StatusCodes } from 'http-status-codes';
 import { User } from '../models/user.models';
 import userRepository from '../repositories/user.repository';
 
-const route = Router();
+const userRoute = Router();
 
-route.get('/:uuid', async (req: Request<{ uuid: string }>, res: Response, next: NextFunction) => {
+userRoute.get('/', async (req: Request, res: Response) => {
+    
+    const users = await userRepository.findAllUsers();
+    res.status(StatusCodes.OK).send(users);
+});
+
+userRoute.get('/:uuid', async (req: Request<{ uuid: string }>, res: Response, next: NextFunction) => {
     try {
         const uuid = req.params.uuid;
         const user: User | null = await userRepository.findByUuid(uuid);
@@ -20,7 +26,7 @@ route.get('/:uuid', async (req: Request<{ uuid: string }>, res: Response, next: 
     }
 });
 
-route.post('/', async (req: Request, res: Response, next: NextFunction) => {
+userRoute.post('/', async (req: Request, res: Response, next: NextFunction) => {
     try {
         const user: User = req.body;
         const uuid = await userRepository.create(user);
@@ -30,7 +36,7 @@ route.post('/', async (req: Request, res: Response, next: NextFunction) => {
     }
 });
 
-route.put('/:uuid', async (req: Request<{ uuid: string }>, res: Response, next: NextFunction) => {
+userRoute.put('/:uuid', async (req: Request<{ uuid: string }>, res: Response, next: NextFunction) => {
     try {
         const uuid = req.params.uuid;
         const user: User = req.body;
@@ -42,7 +48,7 @@ route.put('/:uuid', async (req: Request<{ uuid: string }>, res: Response, next: 
     }
 });
 
-route.delete('/:uuid', async (req: Request<{ uuid: string }>, res: Response, next: NextFunction) => {
+userRoute.delete('/:uuid', async (req: Request<{ uuid: string }>, res: Response, next: NextFunction) => {
     try {
         const uuid = req.params.uuid;
         await userRepository.remove(uuid);
@@ -52,4 +58,4 @@ route.delete('/:uuid', async (req: Request<{ uuid: string }>, res: Response, nex
     }
 });
 
-export default route;
+export default userRoute;
