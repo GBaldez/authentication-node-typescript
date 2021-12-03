@@ -9,7 +9,7 @@
  ### Routes
  
  ### Users
-
+To make requests in these endpoints, you must send the token on auth, bearer.
 * GET /users
 * GET /users/:uuid
 * POST /users
@@ -19,7 +19,6 @@
 ### Authentication
 
 * POST /authentication/token
-* POST /token/validate
 
 ### To Start
 
